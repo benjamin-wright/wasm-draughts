@@ -1,0 +1,34 @@
+<div class="board-frame">
+  <div id="board" class="board" role="group" aria-label="Draughts board" data-revision="{{ revision }}">
+    {% for square in squares %}
+      {% if square.destination %}
+      <button type="submit" form="move-form" name="to" value="{{ square.index }}" class="{{ square.classes }}" data-square="{{ square.index }}" aria-label="{{ square.label }}">
+      {% elif square.selectable %}
+      <a href="{{ square.href }}" class="{{ square.classes }}" data-square="{{ square.index }}" aria-label="{{ square.label }}" {% if square.selected %}aria-current="true"{% endif %}>
+      {% else %}
+      <div class="{{ square.classes }}" data-square="{{ square.index }}" role="img" aria-label="{{ square.label }}">
+      {% endif %}
+        {% if square.occupied %}
+        <span class="piece {{ square.piece_class }} {% if square.king %}king{% endif %}" aria-hidden="true"></span>
+        {% endif %}
+      {% if square.destination %}
+      </button>
+      {% elif square.selectable %}
+      </a>
+      {% else %}
+      </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+  <div id="ranks" class="coordinates ranks" aria-hidden="true">{% for rank in ranks %}<span>{{ rank }}</span>{% endfor %}</div>
+  <div id="files" class="coordinates files" aria-hidden="true">{% for file in files %}<span>{{ file }}</span>{% endfor %}</div>
+</div>
+{% if has_selection %}
+<form id="move-form" action="{{ base }}/play" method="post" hidden>
+  <input type="hidden" name="action" value="move">
+  <input type="hidden" name="token" value="{{ token }}">
+  <input type="hidden" name="revision" value="{{ revision }}">
+  <input type="hidden" name="from" value="{{ select_from }}">
+  <input type="hidden" name="flipped" value="{{ flipped }}">
+</form>
+{% endif %}

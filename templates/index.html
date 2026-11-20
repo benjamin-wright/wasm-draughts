@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f3f0e8">
+  <title>Draughts — The games room</title>
+  {% include "styles.html" %}
+</head>
+<body>
+<div class="shell">
+  <header><div class="brand"><span class="mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>THE GAMES ROOM</div><span class="local">Two players · one board</span></header>
+  <div class="intro"><div><h1>Draughts</h1><p>A familiar board. A little friendly rivalry.</p></div><span class="edition">THE CLASSICS / 01</span></div>
+  <main>
+    <section aria-label="Game board">
+      {% include "board.html" %}
+      <div class="board-footer">
+        <span id="save-status">All moves saved · this browser</span>
+        <a class="text-button" id="flip" href="{{ flip_href }}">↻ Flip board</a>
+      </div>
+    </section>
+    <aside>
+      {% if error != "" %}
+      <p class="error" id="error" role="alert">{{ error }}</p>
+      {% endif %}
+      <div class="turn-card" role="status">
+        <span class="eyebrow" id="turn-label">{% if finished %}A GAME WELL PLAYED{% elif forced %}KEEP THE CAPTURE GOING{% else %}YOUR NEXT MOVE{% endif %}</span>
+        <h2 id="turn-title">{{ player }} {% if finished %}wins.{% else %}to play.{% endif %}</h2>
+        <p id="turn-hint">
+          {% if finished %}The other player has no legal moves. Ready for another round?
+          {% elif forced %}Jump again with the selected piece to finish your turn.
+          {% elif has_selection %}Choose a gold dot to make your move.
+          {% elif capture_available %}A capture is available. Choose a highlighted piece to jump.
+          {% else %}Select a highlighted piece, then choose where to move.{% endif %}
+        </p>
+      </div>
+      <span class="eyebrow">At the table</span>
+      <div class="players">
+        {% for player in players %}
+        <div class="player {% if player.active %}active{% endif %}" id="{{ player.class }}-player">
+          <span class="piece {{ player.class }} mini" aria-hidden="true"></span>
+          <div class="player-text">
+            <strong>{{ player.name }} <span class="active-label">TO PLAY</span></strong>
+            <small id="{{ player.class }}-kings">{{ player.kings }} {% if player.kings == 1 %}king{% else %}kings{% endif %} · {{ player.captured }} captured</small>
+          </div>
+          <span class="count" id="{{ player.class }}-count" aria-label="{{ player.count }} {{ player.name }} pieces">{{ player.count }}</span>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="stats"><span>Turns played <strong id="moves">{{ turns }}</strong></span><span>Last move <strong id="last-move">{{ last_move }}</strong></span></div>
+      {% if confirm_reset %}
+      <section class="reset-panel" aria-labelledby="reset-title">
+        <h2 id="reset-title">Another round?</h2>
+        <p>This replaces your saved position and puts every piece back on the board. Charcoal will move first.</p>
+        <form action="{{ base }}/play" method="post">
+          <input type="hidden" name="action" value="reset">
+          <input type="hidden" name="token" value="{{ token }}">
+          <input type="hidden" name="revision" value="{{ revision }}">
+          <input type="hidden" name="flipped" value="{{ flipped }}">
+          <button class="primary" id="confirm-reset" type="submit">New game</button>
+        </form>
+        <a class="text-button" id="cancel-reset" href="{{ base }}/?flipped={{ flipped }}">Keep playing</a>
+      </section>
+      {% else %}
+      <a class="primary" id="new-game" href="{{ base }}/?confirm=1&amp;flipped={{ flipped }}">Start a new game</a>
+      {% endif %}
+      <details><summary>A quick reminder of the rules</summary><ul>
+        <li>Charcoal moves first. Take turns on this device.</li>
+        <li>Men move one square diagonally forward. Select a piece, then a highlighted square.</li>
+        <li>Captures are compulsory. Jump over an opponent and continue jumping with that piece while possible.</li>
+        <li>Reach the far edge to become a king. Crowning ends your turn; kings can move and jump in either direction.</li>
+        <li>Win by taking every opposing piece or leaving your opponent with no legal move.</li>
+        <li>No automatic draws. Agree a draw between yourselves and start a new game.</li>
+      </ul></details>
+    </aside>
+  </main>
+  <footer><span>English draughts · 8 × 8</span><span>Made for a quiet moment together.</span></footer>
+</div>
+</body>
+</html>

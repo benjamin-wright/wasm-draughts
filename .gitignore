@@ -1,0 +1,4 @@
+.wr/
+/Cargo.toml
+/target/
+/.wr-data/
